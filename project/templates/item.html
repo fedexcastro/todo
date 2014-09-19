@@ -1,0 +1,26 @@
+<form name="form.state" class="form-horizontal" role="form" ng-submit="submit()">
+    <div class="col-md-8">
+        <fieldset class="form-group">
+            <input type="text" ng-model="form.data.title" class="form-control" placeholder="Title" title="Title" value="{[{ form.data.title }]}"/>
+        </fieldset>
+    </div>
+    <div class="col-md-2">
+        <fieldset class="form-group">
+            <select class="form-control" ng-model="form.data.priority" ng-options="priority for priority in [1,2,3,4,5]"  title="Priority">
+                <option value="">Priority</option>
+            </select>
+        </fieldset>
+    </div>
+    <div class="col-md-2">
+        <fieldset class="form-group">
+            <select class="form-control" ng-model="form.data.completed" ng-options="val for val in [true, false]"></select>
+        </fieldset>
+    </div>
+    <div class="col-md-12">
+        <fieldset class="form-group">
+            <textarea type="text" ng-model="form.data.description" class="form-control" placeholder="Description" title="Description">{[{ form.data.description }]}</textarea>
+        </fieldset>
+    </div>
+    <delete-item-action ng-if="form.action==='delete'"></delete-item-action>
+    <add-item-action ng-if="form.action==='add'"></add-item-action>
+</form>

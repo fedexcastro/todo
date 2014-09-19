@@ -1,0 +1,40 @@
+{% load static %}
+{% load todo_tags %}
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html lang="en" ng-app="todo">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <title>TODO App</title>
+    <meta name="description" content="TODO APP Manager">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" type="text/css" href="{% static "vendor/bootstrap-3.2.0-dist/css/bootstrap.min.css" %}">
+    <script src="{% static "vendor/jquery-1.11.1.min.js" %}"></script>
+    <script src="{% static "vendor/angular/angular.js" %}"></script>
+    <script src="{% static "vendor/bootstrap-3.2.0-dist/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "js/directives.js" %}"></script>
+    <script src="{% static "js/todo.js" %}"></script>
+</head>
+<body data-spy="scroll" data-target="#scrollTarget" data-offset="150">
+<div class="container" ng-controller="ListController as listCtrl">
+    <div class="row">
+        <div class="col-md-12"><h1>My TODO List ({% get_username %})</h1></div>
+    </div>
+    <div class="row well" ng-controller="ItemController as ItemCtrl" ng-init="init(item, 'add')">
+        <item-directive></item-directive>
+    </div>
+    <div class="row" id="my-todo-items">
+        <div class="col-md-12 well" ng-repeat="item in items">
+            <div id="item-{[{ item.id }]}" ng-controller="ItemController as ItemCtrl" ng-init="init(item, 'delete')">
+                <item-directive></item-directive>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

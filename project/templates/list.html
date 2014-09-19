@@ -1,0 +1,8 @@
+<p>hola culeau, estos son tus todo</p>
+<div ng-repeat="item in list.getItems()">
+    <div>
+        <h3>{[{ item.title }]}</h3>
+        <p>{[{ item.description }]}</p>
+        <p>{[{ item.due_date | date }]}</p>
+    </div>
+</div>
