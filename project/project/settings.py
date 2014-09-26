@@ -7,11 +7,13 @@ https://docs.djangoproject.com/en/1.7/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
+SITE_ID = 1
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+PROJECT_URL = 'http://localhost'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -26,8 +28,18 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+OAUTH_ACCESS_TOKEN_MODEL = 'provider.oauth2.models.AccessToken'
 # Application definition
+
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+ACCOUNT_LOGOUT_ON_GET = True
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -38,6 +50,15 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'tastypie',
     'todo',
+    'todouser',
+    'provider',
+    'provider.oauth2',
+    'tastypie_oauth',
+     # The Django sites framework is required
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -70,6 +91,16 @@ DATABASES = {
 }
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    # Required by allauth template tags
+    "django.core.context_processors.request",
+    # allauth specific context processors
+    "allauth.account.context_processors.account",
+    "allauth.socialaccount.context_processors.socialaccount",
+    "django.contrib.auth.context_processors.auth",
+)
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/

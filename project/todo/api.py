@@ -1,10 +1,23 @@
-from django.contrib.auth.models import User
+from tastypie_oauth.authentication import OAuth20Authentication
+from tastypie.authentication import SessionAuthentication, MultiAuthentication
+from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource
 from tastypie.authorization import DjangoAuthorization
-from tastypie.authentication import BasicAuthentication, ApiKeyAuthentication, MultiAuthentication
 from tastypie.paginator import Paginator
 
 from todo.models import TodoItem
+from todouser.models import User
+
+
+class MyAuthentication(SessionAuthentication):
+    def is_authenticated(self, request, **kwargs):
+        return request.user.is_authenticated()
+
+
+class MyModelResource(ModelResource):
+
+    def wrap_view(self, view):
+        super(MyModelResource, self).wrap_view(view)
 
 
 class TodoItemResource(ModelResource):
@@ -14,8 +27,8 @@ class TodoItemResource(ModelResource):
         resource_name = 'item'
         excludes = ['created_datetime', 'last_edit_datetime', 'user']
 
-        authentication = MultiAuthentication(BasicAuthentication(), ApiKeyAuthentication())
-        authorization = DjangoAuthorization()
+        authorization = Authorization()
+        authentication = MultiAuthentication(SessionAuthentication(), OAuth20Authentication())
 
         paginator = Paginator
 
@@ -33,12 +46,29 @@ class TodoItemResource(ModelResource):
         return bundle
 
     def get_object_list(self, request):
-        return super(TodoItemResource, self).get_object_list(request).filter(user=request.user)
-        
-# from tastypie.authorization import Authorization
+        return super(TodoItemResource, self).get_object_list(request).filter(user__username=request.user.username).order_by('priority')
 
 
-# class AuthorizationLimits(Authorization):
-#
-#     def read_list(self, object_list, bundle):
-#         return object_list.filter(user__id=bundle.request.user.id)
+class TodoUserResource(ModelResource):
+    class Meta:
+        queryset = User.objects.all()
+        allowed_methods = ['get', 'put']
+        resource_name = 'user'
+        excludes = ['password', 'is_staff', 'is_superuser']
+
+        authorization = DjangoAuthorization()
+        authentication = MultiAuthentication(OAuth20Authentication(), SessionAuthentication())
+
+    def dehydrate(self, bundle):
+        clients = [{'name': ak.name,
+                    'url': ak.url,
+                    'client_id': ak.client_id,
+                    'client_secret': ak.client_secret} for ak in bundle.obj.oauth2_client.all()]
+
+        bundle.data['clients'] = clients
+        return bundle
+
+    def get_object_list(self, request):
+        return super(TodoUserResource, self).get_object_list(request).filter(username=request.user.username)
+
+
